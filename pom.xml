@@ -37,7 +37,6 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<start-class>sample.tomcat.jndi.SampleTomcatJndiApplication</start-class>
-		<java.version>1.8</java.version>
 	</properties>
 
 	<build>
