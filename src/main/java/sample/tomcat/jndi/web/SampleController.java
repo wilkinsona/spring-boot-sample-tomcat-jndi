@@ -16,32 +16,47 @@
 
 package sample.tomcat.jndi.web;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import sample.tomcat.jndi.legacycode.UnmodifiableLegacyCode;
+import sample.tomcat.jndi.services.SampleJmsService;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-@Controller
+@RestController
 public class SampleController {
 
 	@Autowired
 	private DataSource dataSource;
 
+	@Autowired
+	private SampleJmsService jmsService;
+
 	@RequestMapping("/factoryBean")
-	@ResponseBody
 	public String factoryBean() {
 		return "DataSource retrieved from JNDI using JndiObjectFactoryBean: " + dataSource;
 	}
 
 	@RequestMapping("/direct")
-	@ResponseBody
 	public String direct() throws NamingException {
 		return "DataSource retrieved directly from JNDI: " +
 				new InitialContext().lookup("java:comp/env/jdbc/myDataSource");
+	}
+
+	@RequestMapping("/queueFromJndi")
+	public String queueFromJndi() throws NamingException {
+		return "JMS Queue retrieved directly from JNDI by legacy code: " +
+				UnmodifiableLegacyCode.getMessageQueue();
+	}
+
+	@RequestMapping("/message/{text}")
+	public String sendMessage(@PathVariable String text) {
+		jmsService.sendMessage(text);
+		return "message [" + text + "] sent";
 	}
 
 }
